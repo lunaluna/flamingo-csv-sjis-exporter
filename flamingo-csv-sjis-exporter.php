@@ -3,7 +3,7 @@
  * Plugin Name:       Flamingo CSV Shift_JIS Exporter
  * Plugin URI:        https://github.com/lunaluna/flamingo-csv-sjis-exporter.php
  * Description:       Flamingo の受信メッセージ CSV 出力を Shift_JIS (CP932) に変換します.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            lunaluna_dev
@@ -138,8 +138,8 @@ function init(): void {
 
 	// Flamingo が有効な場合のみ各処理を登録する.
 	add_action( 'admin_init', __NAMESPACE__ . '\\check_flamingo_version' );
-	add_action( 'load-flamingo_page_flamingo-inbound', __NAMESPACE__ . '\\maybe_start_buffer', 1 );
-	add_action( 'load-flamingo_page_flamingo-inbound', __NAMESPACE__ . '\\convert_and_flush', 9999 );
+	// Inbound のサブメニュー slug は load-flamingo_page_flamingo_inbound.
+	add_action( 'load-flamingo_page_flamingo_inbound', __NAMESPACE__ . '\\maybe_start_buffer', 1 );
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
 
@@ -264,11 +264,12 @@ function render_version_notice(): void {
 // ---------------------------------------------------------------------------
 
 /**
- * Flamingo の CSV エクスポートリクエスト時に出力バッファを開始する.
+ * Flamingo の CSV エクスポート時に出力バッファを開始し、flush 時に Shift_JIS へ変換する.
  *
- * Flamingo のエクスポート処理は admin.php 内で $_GET['export'] の有無を
- * チェックして直接 echo するため、ob_start() でバッファリングしてキャプチャする.
- * 優先度 1（最優先）で登録することで、Flamingo の出力より先にバッファを開始する.
+ * Flamingo は inbound 読み込みで $_GET['export'] があると CSV を echo して exit する.
+ * そのため同一 load フック上で「export の後」に別コールバックを置いても exit により
+ * 決して実行されない. ob_start() のハンドラなら exit 時のバッファ flush で必ず実行される.
+ * 優先度 1 で開始し、flamingo_load_inbound_admin（既定 10）より先にバッファを掛ける.
  */
 function maybe_start_buffer(): void {
 	// Flamingo が export 用に使用する GET は本体側でも nonce を検証しない.
@@ -277,36 +278,23 @@ function maybe_start_buffer(): void {
 		return;
 	}
 
-	ob_start();
-}
+	ob_start(
+		static function ( string $buffer, int $phase ): string {
+			unset( $phase );
 
-/**
- * バッファにキャプチャした CSV を UTF-8 から Shift_JIS (CP932) に変換して出力する.
- *
- * SJIS-win（CP932）は Windows の拡張 Shift_JIS であり、
- * 純粋な SJIS より対応文字数が多く、Windows 環境向けの出力に適している.
- * 変換後に Content-Type ヘッダーを上書きし、exit でレスポンスを終了する.
- * 優先度 9999（最後）で登録することで、Flamingo の出力がすべてバッファに
- * 書き込まれた後に変換処理を行う.
- */
-function convert_and_flush(): void {
-	// Flamingo が export 用に使用する GET は本体側でも nonce を検証しない.
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	if ( empty( $_GET['export'] ) ) {
-		return;
-	}
+			if ( ! headers_sent() ) {
+				header_remove( 'Content-Type' );
+				header( 'Content-Type: application/octet-stream; charset=Shift_JIS' );
+			}
 
-	$output = ob_get_clean();
+			if ( '' === $buffer ) {
+				return '';
+			}
 
-	if ( false === $output || '' === $output ) {
-		return;
-	}
-
-	// Content-Type の charset を Shift_JIS に上書きする.
-	header( 'Content-Type: application/octet-stream; charset=Shift_JIS' );
-
-	// UTF-8 → SJIS-win (CP932) に変換して出力する.
-	// SJIS-win は Windows 拡張の Shift_JIS（CP932）で、純粋な SJIS より対応文字が多い.
-	echo mb_convert_encoding( $output, 'SJIS-win', 'UTF-8' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	exit;
+			// UTF-8 → SJIS-win (CP932). Windows 向け CSV で一般的.
+			return mb_convert_encoding( $buffer, 'SJIS-win', 'UTF-8' );
+		},
+		0,
+		PHP_OUTPUT_HANDLER_CLEANABLE | PHP_OUTPUT_HANDLER_REMOVABLE
+	);
 }
