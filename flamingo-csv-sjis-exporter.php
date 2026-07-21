@@ -45,7 +45,7 @@ const TARGET_PLUGIN = 'flamingo/flamingo.php';
  * このプラグインが動作確認済みの Flamingo バージョン.
  * Flamingo のアップデート後に動作確認が取れたタイミングで手動更新する.
  */
-const TESTED_VERSION = '2.6.2';
+const TESTED_VERSION = '2.6.3';
 
 // ---------------------------------------------------------------------------
 // Flamingo 有効化チェックユーティリティ
