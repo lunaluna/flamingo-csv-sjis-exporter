@@ -1,17 +1,18 @@
 <?php
 /**
  * Plugin Name:       Flamingo CSV Shift_JIS Exporter
- * Plugin URI:        https://github.com/lunaluna/flamingo-csv-sjis-exporter.php
+ * Plugin URI:        https://github.com/lunaluna/flamingo-csv-sjis-exporter
  * Description:       Flamingo の受信メッセージ CSV 出力を Shift_JIS (CP932) に変換します.
  * Version:           1.1.0
  * Requires at least: 6.0
+ * Tested up to:      7.1
  * Requires PHP:      7.4
  * Author:            lunaluna_dev
  * Author URI:        https://profiles.wordpress.org/lunaluna_dev/
+ * Update URI:        false
  * License:           GPLv2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       flamingo-csv-sjis-exporter.php
- * Domain Path:       /languages
+ * Text Domain:       flamingo-csv-sjis-exporter
  *
  * @package FCSE
  */
@@ -19,6 +20,10 @@
 declare( strict_types=1 );
 
 namespace Flamingo_Sjis_Exporter;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * `wp_options` に保存する既知バージョンのオプションキー.
@@ -46,6 +51,22 @@ const TARGET_PLUGIN = 'flamingo/flamingo.php';
  * Flamingo のアップデート後に動作確認が取れたタイミングで手動更新する.
  */
 const TESTED_VERSION = '2.6.3';
+
+// ---------------------------------------------------------------------------
+// 自動更新機構の登録
+//
+// Flamingo が無効な状態でもプラグイン自身の更新はできなければならないため、
+// Flamingo の有効化判定より前・無条件に登録する.
+// ---------------------------------------------------------------------------
+
+$flamingo_sjis_updater_register = require plugin_dir_path( __FILE__ ) . 'lib/l2d-updater/loader.php';
+$flamingo_sjis_updater_register(
+	array(
+		'plugin_file' => __FILE__,
+		'github_repo' => 'lunaluna/flamingo-csv-sjis-exporter',
+		'cache_key'   => 'flamingo_sjis_github_release_cache',
+	)
+);
 
 // ---------------------------------------------------------------------------
 // Flamingo 有効化チェックユーティリティ
@@ -81,8 +102,8 @@ function is_flamingo_active(): bool {
 function on_activation(): void {
 	if ( ! is_flamingo_active() ) {
 		wp_die(
-			esc_html__( 'Flamingo CSV Shift_JIS Exporter を有効化するには Flamingo プラグインが必要です.先に Flamingo を有効化してください.' ),
-			esc_html__( 'プラグインの有効化エラー' ),
+			esc_html__( 'Flamingo CSV Shift_JIS Exporter を有効化するには Flamingo プラグインが必要です.先に Flamingo を有効化してください.', 'flamingo-csv-sjis-exporter' ),
+			esc_html__( 'プラグインの有効化エラー', 'flamingo-csv-sjis-exporter' ),
 			array( 'back_link' => true )
 		);
 	}
@@ -166,9 +187,10 @@ function get_flamingo_version(): ?string {
 		return null;
 	}
 
-	$data = get_plugin_data( $plugin_file, false, false );
+	$data    = get_plugin_data( $plugin_file, false, false );
+	$version = $data['Version'];
 
-	return $data['Version'] ?? null;
+	return '' !== $version ? $version : null;
 }
 
 // ---------------------------------------------------------------------------

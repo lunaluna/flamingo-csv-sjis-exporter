@@ -18,3 +18,6 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 // バージョン管理に使用したオプションを削除する.
 // 定数 OPTION_KEY はこのファイルのスコープでは使用できないため文字列リテラルで指定する.
 delete_option( 'flamingo_sjis_known_version' );
+
+// 自動更新機構が保存する GitHub Release のキャッシュを削除する.
+delete_site_transient( 'flamingo_sjis_github_release_cache' );
