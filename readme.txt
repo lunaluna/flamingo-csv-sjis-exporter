@@ -2,8 +2,8 @@
 Contributors: lunaluna_dev
 Tags: flamingo, csv, export, shift-jis, sjis, encoding
 Requires at least: 6.0
-Tested up to: 6.5
-Stable tag: 1.1.0
+Tested up to: 7.1
+Stable tag: 1.2.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -24,7 +24,7 @@ Contact Form 7 付属の [Flamingo](https://wordpress.org/plugins/flamingo/) が
 * Flamingo のバージョンが更新されたときに警告を表示し、動作確認を促す。「確認済みにする」で通知を消せる。
 * プラグイン削除時に保存したバージョン情報オプションを削除する（`uninstall.php`）。
 
-開発者向けメモ：プラグイン動作確認済みとしてコード内で宣言している Flamingo のバージョンは 2.6.2 です。Flamingo をアップデートしたあとは CSV 出力が問題ないか確認してください。
+開発者向けメモ：プラグイン動作確認済みとしてコード内で宣言している Flamingo のバージョンは 2.6.4 です。Flamingo をアップデートしたあとは CSV 出力が問題ないか確認してください。
 
 == Installation ==
 
@@ -50,6 +50,11 @@ UTF-8 から **SJIS-win（CP932）** に変換します。ダウンロード応�
 
 == Changelog ==
 
+= 1.2.0 =
+* GitHub Releases からの自動アップデート機構を追加。管理画面から通常の更新フロー（通知 → ワンクリック更新）が使えるようになりました。
+* WordPress 7.1 で動作確認済み（Tested up to を更新）。
+* プラグイン動作確認済み Flamingo バージョンを 2.6.4 に更新。
+
 = 1.1.0 =
 * 管理画面フックを `load-flamingo_page_flamingo_inbound` に修正（これまでハイフン付きフックとなっており、変換が実行されていなかった）。
 * Flamingo が CSV 出力後に `exit()` するため、同一フックの後段での変換処理に到達しなかった問題を、`ob_start()` の出力ハンドラで変換する方式に変更。
@@ -58,6 +63,9 @@ UTF-8 から **SJIS-win（CP932）** に変換します。ダウンロード応�
 * 初版リリース。
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+GitHub Releases からの自動アップデートに対応し、WordPress 7.1 で動作確認しました。
 
 = 1.1.0 =
 受信メッセージ CSV の Shift_JIS 変換が正しく適用されるよう、フック名と出力バッファの扱いを修正しました。
