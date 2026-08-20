@@ -1,0 +1,15 @@
+.git
+.github
+.gitignore
+.gitattributes
+.editorconfig
+.distignore
+.claude
+.DS_Store
+bin
+tests
+vendor
+composer.json
+composer.lock
+phpcs.xml.dist
+phpstan.neon.dist
