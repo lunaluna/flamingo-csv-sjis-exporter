@@ -7,6 +7,7 @@
  * Requires at least: 6.0
  * Tested up to:      7.1
  * Requires PHP:      7.4
+ * Requires Plugins:  flamingo
  * Author:            lunaluna_dev
  * Author URI:        https://profiles.wordpress.org/lunaluna_dev/
  * Update URI:        false
