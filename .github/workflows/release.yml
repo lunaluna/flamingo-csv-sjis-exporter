@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]*'
+      - 'v[0-9]*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. 1.2.0)'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: lunaluna/l2d-wp-github-update-lib/.github/workflows/plugin-release.yml@1.1.0
+    with:
+      slug: flamingo-csv-sjis-exporter
+      version_files: |
+        flamingo-csv-sjis-exporter.php:^[[:space:]]*\*[[:space:]]*Version:
+        readme.txt:^Stable tag:
+      notes_source: readme.txt
