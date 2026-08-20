@@ -1,0 +1,10 @@
+parameters:
+	level: 5
+	paths:
+		- flamingo-csv-sjis-exporter.php
+		- uninstall.php
+	excludePaths:
+		- vendor/*
+
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<ruleset name="FlamingoCsvSjisExporter">
+	<description>Coding standards for Flamingo CSV Shift_JIS Exporter.</description>
+
+	<file>.</file>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/lib/*</exclude-pattern>
+
+	<arg value="sp"/>
+	<arg name="basepath" value="."/>
+	<arg name="colors"/>
+	<arg name="extensions" value="php"/>
+
+	<config name="minimum_supported_wp_version" value="6.0"/>
+	<config name="testVersion" value="7.4-"/>
+	<config name="text_domain" value="flamingo-csv-sjis-exporter"/>
+
+	<rule ref="WordPress-Extra">
+		<exclude name="WordPress.Files.FileName"/>
+	</rule>
+
+	<rule ref="WordPress-Docs"/>
+
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="flamingo_sjis"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

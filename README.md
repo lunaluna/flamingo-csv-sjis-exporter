@@ -2,9 +2,9 @@
 
 WordPress プラグインです。[Flamingo](https://wordpress.org/plugins/flamingo/) の受信メッセージ CSV エクスポートを **Shift_JIS（CP932 / SJIS-win）** に変換し、Excel など Windows 環境での文字化けを防ぎます。
 
-- **Requires WordPress:** 6.0+
+- **Requires WordPress:** 6.0+（7.1 で動作確認済み）
 - **Requires PHP:** 7.4+
-- **Stable tag:** 1.1.0
+- **Stable tag:** 1.2.0
 - **License:** GPLv2 or later
 
 ## 動作条件
@@ -18,6 +18,8 @@ WordPress プラグインです。[Flamingo](https://wordpress.org/plugins/flami
 2. このプラグインを `wp-content/plugins/` に配置する。
 3. 管理画面の「プラグイン」から有効化する。
 
+初回リリース（1.2.0）以降は GitHub Releases から自動アップデート機構が有効になり、通常のプラグイン更新フロー（更新通知 → ワンクリック更新）でこのプラグイン自身を更新できます。
+
 ## 使い方
 
 Flamingo の **受信メッセージ** 画面から従来どおり CSV をエクスポートします。プラグインが有効な場合、ダウンロードされる CSV は UTF-8 ではなく **SJIS-win に変換されたバイト列** になります。HTTP ヘッダーの `charset` も `Shift_JIS` に合わせて設定されます。
@@ -28,7 +30,7 @@ Flamingo の **受信メッセージ** 画面から従来どおり CSV をエク
 
 Flamingo がアップデートされると、管理画面に **動作確認を促す警告** が出ることがあります。問題なければ「確認済みにする」で通知を消せます。
 
-コード内では、このプラグインの動作確認済み Flamingo バージョンとして **2.6.2** が宣言されています（`TESTED_VERSION`）。Flamingo を大きく更新したあとは、CSV が期待どおりか確認することをおすすめします。
+コード内では、このプラグインの動作確認済み Flamingo バージョンとして **2.6.4** が宣言されています（`TESTED_VERSION`）。Flamingo を大きく更新したあとは、CSV が期待どおりか確認することをおすすめします。
 
 ## アンインストール
 
@@ -40,6 +42,12 @@ Flamingo がアップデートされると、管理画面に **動作確認を�
 - **Author:** [lunaluna_dev](https://profiles.wordpress.org/lunaluna_dev/)
 
 ## 変更履歴
+
+### 1.2.0
+
+- GitHub Releases からの自動アップデート機構（`lunaluna/l2d-wp-github-update-lib`）を同梱し、管理画面から通常の更新フロー（通知 → ワンクリック更新）が使えるようにした。
+- WordPress 7.1 で動作確認し、`Tested up to: 7.1` を宣言した。
+- 動作確認済み Flamingo バージョンを **2.6.4** に更新した。
 
 ### 1.1.0
 
