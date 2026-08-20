@@ -85,4 +85,7 @@ jobs:
           # 意図的な実装であり、wp.org 未登録スラッグの乗っ取り防止
           # （サブスクワッティング型サプライチェーン攻撃対策）は引き続き有効。
           # 既知の false positive として無視する.
-          ignore-codes: 'plugin_updater_detected'
+          # readme.txt は日本語圏の CF7/Flamingo ユーザー向けのため意図的に
+          # 日本語で書いている（wp.org 未公開・GitHub Releases 配布専用のため
+          # 英語必須ルールの対象外とする）.
+          ignore-codes: 'plugin_updater_detected,readme_short_description_non_official_language,readme_description_non_official_language'
