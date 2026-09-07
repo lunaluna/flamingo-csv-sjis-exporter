@@ -3,7 +3,7 @@ Contributors: lunaluna_dev
 Tags: flamingo, csv, export, shift-jis, sjis, encoding
 Requires at least: 6.0
 Tested up to: 7.1
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 Requires PHP: 7.4
 Requires Plugins: flamingo
 License: GPLv2 or later
@@ -55,6 +55,12 @@ UTF-8 から **SJIS-win（CP932）** に変換します。ダウンロード応�
 
 == Changelog ==
 
+= 1.2.1 =
+* バージョン通知が動作確認済みバージョン（TESTED_VERSION）を宣言し直しても消えないバグを修正。通知条件を DB の旧値ではなく TESTED_VERSION との対比に変更し、対応宣言だけで自動的に消えるようにした。
+* 通知の表示と「確認済みにする」操作を activate_plugins 権限を持つユーザーに限定。
+* 保存したバージョン情報オプションのキーを flamingo_sjis_acked_version に改名（値の移行なし。既存の確認済み状態は失われる）。
+* プラグイン有効化時のバージョン自動保存を廃止し、書き込みを「確認済みにする」操作のみに限定。
+
 = 1.2.0 =
 * GitHub Releases からの自動アップデート機構を追加。管理画面から通常の更新フロー（通知 → ワンクリック更新）が使えるようになりました。
 * WordPress 7.1 で動作確認済み（Tested up to を更新）。
@@ -68,6 +74,9 @@ UTF-8 から **SJIS-win（CP932）** に変換します。ダウンロード応�
 * 初版リリース。
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+バージョン通知が消えないバグの修正です。既存の「確認済みにする」状態はリセットされるため、通知が出た場合は再度クリックしてください。
 
 = 1.2.0 =
 GitHub Releases からの自動アップデートに対応し、WordPress 7.1 で動作確認しました。

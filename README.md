@@ -4,7 +4,7 @@ WordPress プラグインです。[Flamingo](https://wordpress.org/plugins/flami
 
 - **Requires WordPress:** 6.0+（7.1 で動作確認済み）
 - **Requires PHP:** 7.4+
-- **Stable tag:** 1.2.0
+- **Stable tag:** 1.2.1
 - **License:** GPLv2 or later
 
 ## 動作条件
@@ -43,6 +43,13 @@ Flamingo の **受信メッセージ** 画面から従来どおり CSV をエク
 - **Author:** [lunaluna_dev](https://profiles.wordpress.org/lunaluna_dev/)
 
 ## 変更履歴
+
+### 1.2.1
+
+- バージョン通知が「動作確認済みバージョン（`TESTED_VERSION`）を宣言し直しても消えない」バグを修正した。通知条件を DB の旧値ではなく `TESTED_VERSION` との対比に変更し、対応宣言だけで次のページ読み込みから通知が自動的に消えるようにした。
+- 通知の表示と「確認済みにする」操作を `activate_plugins` 権限を持つユーザーに限定した。
+- オプションキーを `flamingo_sjis_known_version` から `flamingo_sjis_acked_version` に改名した（値の移行はしない。既存の ack 状態は失われるため再度「確認済みにする」を押す必要がある）。
+- プラグイン有効化時の既知バージョン自動保存を廃止し、`wp_options` への書き込みを「確認済みにする」操作のみに限定した。
 
 ### 1.2.0
 
