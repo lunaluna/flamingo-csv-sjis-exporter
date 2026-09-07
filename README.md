@@ -4,7 +4,7 @@ WordPress プラグインです。[Flamingo](https://wordpress.org/plugins/flami
 
 - **Requires WordPress:** 6.0+（7.1 で動作確認済み）
 - **Requires PHP:** 7.4+
-- **Stable tag:** 1.2.1
+- **Stable tag:** 1.3.0
 - **License:** GPLv2 or later
 
 ## 動作条件
@@ -43,6 +43,10 @@ Flamingo の **受信メッセージ** 画面から従来どおり CSV をエク
 - **Author:** [lunaluna_dev](https://profiles.wordpress.org/lunaluna_dev/)
 
 ## 変更履歴
+
+### 1.3.0
+
+- 同梱の自動更新ライブラリ（`lunaluna/l2d-wp-github-update-lib`）を `dist-1.2.0` に更新した。利用者から見た機能変化はない（自己申告バージョン文字列と、同居する他プラグインとの版交渉ロジックの判定値のみが変わる）。
 
 ### 1.2.1
 
