@@ -3,7 +3,7 @@
  * Plugin Name:       Flamingo CSV Shift_JIS Exporter
  * Plugin URI:        https://github.com/lunaluna/flamingo-csv-sjis-exporter
  * Description:       Flamingo の受信メッセージ CSV 出力を Shift_JIS (CP932) に変換します.
- * Version:           1.2.1
+ * Version:           1.3.0
  * Requires at least: 6.0
  * Tested up to:      7.1
  * Requires PHP:      7.4
