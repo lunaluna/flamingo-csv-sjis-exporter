@@ -205,8 +205,16 @@ function get_flamingo_version(): ?string {
  * 1. 「確認済み」ボタン押下時は nonce を検証し、既知バージョンを現在値に更新してリダイレクト.
  * 2. 既知バージョンが未保存（初回）の場合は現在値を保存して終了.
  * 3. 既知バージョンより現在のバージョンが新しければ admin_notices に通知を登録.
+ *
+ * `activate_plugins` 権限を持たないユーザーには何もしない.
+ * 「CSV 出力の動作確認」は権限のないユーザーには行動不可能な指示であるため.
+ * マルチサイトではサブサイトの管理者がこの権限を持たない場合がある.
  */
 function check_flamingo_version(): void {
+	if ( ! current_user_can( 'activate_plugins' ) ) {
+		return;
+	}
+
 	// 「確認済み」ボタン押下時の処理.
 	if (
 		isset( $_GET[ NOTICE_ACTION ] ) &&
