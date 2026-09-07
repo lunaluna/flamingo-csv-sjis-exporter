@@ -15,8 +15,12 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-// バージョン管理に使用したオプションを削除する.
+// バージョン確認済み操作(ack)で保存したオプションを削除する.
 // 定数 OPTION_KEY はこのファイルのスコープでは使用できないため文字列リテラルで指定する.
+delete_option( 'flamingo_sjis_acked_version' );
+
+// レガシー掃除: 1.2.1 より前に使用していた旧キー. 新規インストールでは作成されないが、
+// 既存サイトのアンインストール時に残留させないため削除を継続する.
 delete_option( 'flamingo_sjis_known_version' );
 
 // 自動更新機構が保存する GitHub Release のキャッシュを削除する.

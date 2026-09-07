@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * 未 ack のサイトにはこのオプション自体が存在しない（値は '' として扱う）.
  * アンインストール時に uninstall.php から削除される.
  */
-const OPTION_KEY = 'flamingo_sjis_known_version';
+const OPTION_KEY = 'flamingo_sjis_acked_version';
 
 /**
  * バージョン変化通知の「確認済み」ボタンで使用する nonce アクション名.
