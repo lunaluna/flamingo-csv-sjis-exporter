@@ -101,8 +101,10 @@ function is_flamingo_active(): bool {
  * プラグイン有効化時の処理.
  *
  * Flamingo が有効化されていない場合は wp_die() で有効化を中断する.
- * Flamingo が有効な場合はその時点のバージョンを wp_options に保存し、
- * 以降のバージョン変化検知の基準値とする.
+ *
+ * 既知バージョンの保存はしない. OPTION_KEY への書き込みは
+ * 「確認済みにする」操作（maybe_handle_ack_request()）だけが行う唯一の経路であり、
+ * ここで書いてしまうと危険セル（$acked > $tested）を有効化のたびに作り出してしまう.
  */
 function on_activation(): void {
 	if ( ! is_flamingo_active() ) {
@@ -111,12 +113,6 @@ function on_activation(): void {
 			esc_html__( 'プラグインの有効化エラー', 'flamingo-csv-sjis-exporter' ),
 			array( 'back_link' => true )
 		);
-	}
-
-	$version = get_flamingo_version();
-
-	if ( null !== $version ) {
-		update_option( OPTION_KEY, $version, false );
 	}
 }
 register_activation_hook( __FILE__, __NAMESPACE__ . '\\on_activation' );
@@ -256,10 +252,42 @@ function should_notify_version( ?string $current, string $acked, string $tested 
 }
 
 /**
+ * 「確認済みにする」ボタン押下時の処理.
+ *
+ * Nonce 検証に成功し、かつ現時点でも通知条件を満たしている場合のみ
+ * 現在の Flamingo バージョンを既知バージョンとして保存する（OPTION_KEY への
+ * 唯一の書き込み経路）. 条件を満たさない場合（対象バージョンが既に ack 済み、
+ * tested 以下に戻っている等）は何も書かずにリダイレクトのみ行う.
+ *
+ * `isset( $_GET[ NOTICE_ACTION ] )` と check_admin_referer() は同一関数・
+ * 同一条件式に置くこと. 分割すると WPCS の nonce スニフが
+ * 検証漏れとして誤検知する.
+ */
+function maybe_handle_ack_request(): void {
+	if (
+		! isset( $_GET[ NOTICE_ACTION ] ) ||
+		! check_admin_referer( NOTICE_NONCE )
+	) {
+		return;
+	}
+
+	$current = get_flamingo_version();
+
+	if ( should_notify_version( $current, get_acked_version() ) ) {
+		// null !== $current は should_notify_version() が真である時点で保証される.
+		update_option( OPTION_KEY, $current, false );
+	}
+
+	// クエリパラメータを除去してリダイレクトし、ブラウザの再送信を防ぐ.
+	wp_safe_redirect( remove_query_arg( array( NOTICE_ACTION, '_wpnonce' ) ) );
+	exit;
+}
+
+/**
  * `admin_init` タイミングで Flamingo のバージョン変化を検知する.
  *
  * 処理の流れ：
- * 1. 「確認済み」ボタン押下時は nonce を検証し、既知バージョンを現在値に更新してリダイレクト.
+ * 1. 「確認済み」ボタン押下時は maybe_handle_ack_request() に委譲する.
  * 2. should_notify_version() が真なら admin_notices に通知を登録.
  *
  * `activate_plugins` 権限を持たないユーザーには何もしない.
@@ -271,22 +299,7 @@ function check_flamingo_version(): void {
 		return;
 	}
 
-	// 「確認済み」ボタン押下時の処理.
-	if (
-		isset( $_GET[ NOTICE_ACTION ] ) &&
-		check_admin_referer( NOTICE_NONCE )
-	) {
-		$current = get_flamingo_version();
-
-		if ( null !== $current ) {
-			// 現在のバージョンを既知バージョンとして上書き保存する.
-			update_option( OPTION_KEY, $current, false );
-		}
-
-		// クエリパラメータを除去してリダイレクトし、ブラウザの再送信を防ぐ.
-		wp_safe_redirect( remove_query_arg( array( NOTICE_ACTION, '_wpnonce' ) ) );
-		exit;
-	}
+	maybe_handle_ack_request();
 
 	$current = get_flamingo_version();
 
