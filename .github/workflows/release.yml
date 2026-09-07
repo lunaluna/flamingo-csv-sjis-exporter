@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   release:
-    uses: lunaluna/l2d-wp-github-update-lib/.github/workflows/plugin-release.yml@1.1.0
+    uses: lunaluna/l2d-wp-github-update-lib/.github/workflows/plugin-release.yml@1.2.0
     with:
       slug: flamingo-csv-sjis-exporter
       version_files: |
