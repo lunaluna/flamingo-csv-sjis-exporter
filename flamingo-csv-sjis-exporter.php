@@ -175,9 +175,23 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
  * `get_plugin_data()` はヘッダーコメントからバージョンを読み取る.
  * Flamingo のファイルが存在しない場合は null を返す.
  *
+ * 1 リクエスト内で check_flamingo_version() と render_version_notice() の
+ * 両方から呼ばれ得るため、静的変数で結果をメモ化して `get_plugin_data()` の
+ * 二重実行を避ける. 関数内 static はローカル変数のため型宣言できないので、
+ * 「解決済みフラグ + 値」の 2 変数に分けている.
+ *
  * @return string|null バージョン文字列.取得できない場合は null.
  */
 function get_flamingo_version(): ?string {
+	static $resolved = false;
+	static $cached   = null; // string|null. キャッシュされたバージョン文字列.
+
+	if ( $resolved ) {
+		return $cached;
+	}
+
+	$resolved = true;
+
 	if ( ! function_exists( 'get_plugin_data' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
@@ -185,13 +199,15 @@ function get_flamingo_version(): ?string {
 	$plugin_file = WP_PLUGIN_DIR . '/' . TARGET_PLUGIN;
 
 	if ( ! file_exists( $plugin_file ) ) {
-		return null;
+		return $cached;
 	}
 
 	$data    = get_plugin_data( $plugin_file, false, false );
 	$version = $data['Version'];
 
-	return '' !== $version ? $version : null;
+	$cached = '' !== $version ? $version : null;
+
+	return $cached;
 }
 
 /**
@@ -312,11 +328,14 @@ function check_flamingo_version(): void {
  * Flamingo のバージョン変化を知らせる警告通知を描画する.
  *
  * `notice-warning`（黄）で表示し、動作確認を促す.
- * 「確認済みにする」ボタンをクリックすると check_flamingo_version() 内で
- * 既知バージョンが更新され、通知が非表示になる.
+ * DB の旧値（既知バージョン）には一切依存せず、動作確認済みバージョン
+ * （TESTED_VERSION）とインストール済みバージョンとの対比のみで文面を組み立てる.
+ * `admin_init` → `admin_notices` は同一リクエストなので $current の再取得で
+ * 状態が変わる心配はない（guard は null チェックのみで足りる）.
+ * 「確認済みにする」ボタンをクリックすると maybe_handle_ack_request() で
+ * 確認済みバージョンが更新され、通知が非表示になる.
  */
 function render_version_notice(): void {
-	$known   = get_option( OPTION_KEY, '' );
 	$current = get_flamingo_version();
 
 	if ( null === $current ) {
@@ -332,10 +351,10 @@ function render_version_notice(): void {
 	<div class="notice notice-warning">
 		<p>
 			<strong>[Flamingo CSV Shift_JIS Exporter]</strong>
-			Flamingo がバージョン <code><?php echo esc_html( $known ); ?></code> から
-			<code><?php echo esc_html( $current ); ?></code> にアップデートされました.<br>
-			このプラグインの動作確認済みバージョンは <code><?php echo esc_html( TESTED_VERSION ); ?></code> です.
-			CSV 出力の動作に問題がないか確認してください.
+			インストールされている Flamingo のバージョン <code><?php echo esc_html( $current ); ?></code> は、
+			このプラグインが動作確認済みのバージョン <code><?php echo esc_html( TESTED_VERSION ); ?></code> より新しいものです.<br>
+			受信メッセージの CSV 出力（Shift_JIS 変換）が正しく動作するか確認してください.
+			問題がなければ「確認済みにする」で通知を消せます.
 		</p>
 		<p>
 			<a href="<?php echo esc_url( $ack_url ); ?>" class="button button-secondary">
