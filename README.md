@@ -4,7 +4,7 @@ WordPress プラグインです。[Flamingo](https://wordpress.org/plugins/flami
 
 - **Requires WordPress:** 6.0+（7.1 で動作確認済み）
 - **Requires PHP:** 7.4+
-- **Stable tag:** 1.2.0
+- **Stable tag:** 1.2.1
 - **License:** GPLv2 or later
 
 ## 動作条件
@@ -28,13 +28,14 @@ Flamingo の **受信メッセージ** 画面から従来どおり CSV をエク
 
 ## Flamingo のバージョンについて
 
-Flamingo がアップデートされると、管理画面に **動作確認を促す警告** が出ることがあります。問題なければ「確認済みにする」で通知を消せます。
+このプラグインはコード内で「動作確認済みの Flamingo バージョン」（`TESTED_VERSION`、現在 **2.6.4**）を宣言しています。管理画面には **`activate_plugins` 権限を持つユーザー**にのみ、インストール済みの Flamingo がこの動作確認済みバージョンより新しいときに警告が表示されます。
 
-コード内では、このプラグインの動作確認済み Flamingo バージョンとして **2.6.4** が宣言されています（`TESTED_VERSION`）。Flamingo を大きく更新したあとは、CSV が期待どおりか確認することをおすすめします。
+- プラグイン側が `TESTED_VERSION` を上げて対応を宣言すると、**次のページ読み込みで警告は自動的に消えます**（「確認済みにする」を押す必要はありません）。
+- 対応が宣言される前でも、サイト管理者が自己判断で個別に警告を黙らせたい場合は「確認済みにする」を押してください。押した時点のバージョンまでは再表示されず、さらに新しい Flamingo が入れば再び警告が出ます。
 
 ## アンインストール
 
-プラグインを「削除」すると `uninstall.php` が実行され、`wp_options` の `flamingo_sjis_known_version` が削除されます。無効化だけでは削除されません。
+プラグインを「削除」すると `uninstall.php` が実行され、`wp_options` の `flamingo_sjis_acked_version`（「確認済みにする」操作で保存される値。未 ack のサイトでは作成されない）が削除されます。1.2.1 より前に使用していた旧キー `flamingo_sjis_known_version` も、既存サイトの残留を防ぐためあわせて削除されます。無効化だけでは削除されません。
 
 ## リンク
 
@@ -42,6 +43,13 @@ Flamingo がアップデートされると、管理画面に **動作確認を�
 - **Author:** [lunaluna_dev](https://profiles.wordpress.org/lunaluna_dev/)
 
 ## 変更履歴
+
+### 1.2.1
+
+- バージョン通知が「動作確認済みバージョン（`TESTED_VERSION`）を宣言し直しても消えない」バグを修正した。通知条件を DB の旧値ではなく `TESTED_VERSION` との対比に変更し、対応宣言だけで次のページ読み込みから通知が自動的に消えるようにした。
+- 通知の表示と「確認済みにする」操作を `activate_plugins` 権限を持つユーザーに限定した。
+- オプションキーを `flamingo_sjis_known_version` から `flamingo_sjis_acked_version` に改名した（値の移行はしない。既存の ack 状態は失われるため再度「確認済みにする」を押す必要がある）。
+- プラグイン有効化時の既知バージョン自動保存を廃止し、`wp_options` への書き込みを「確認済みにする」操作のみに限定した。
 
 ### 1.2.0
 
