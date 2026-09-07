@@ -27,7 +27,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * `wp_options` に保存する既知バージョンのオプションキー.
+ * `wp_options` に保存する「確認済みにする」で黙らせたバージョンのオプションキー.
+ * 未 ack のサイトにはこのオプション自体が存在しない（値は '' として扱う）.
  * アンインストール時に uninstall.php から削除される.
  */
 const OPTION_KEY = 'flamingo_sjis_known_version';
@@ -50,6 +51,9 @@ const TARGET_PLUGIN = 'flamingo/flamingo.php';
 /**
  * このプラグインが動作確認済みの Flamingo バージョン.
  * Flamingo のアップデート後に動作確認が取れたタイミングで手動更新する.
+ * インストール済みの Flamingo がこの値を超えたときだけ通知が出る.
+ * この値を上げて対応を宣言すれば、通知は次のページ読み込みで自動的に消える
+ * （既知バージョンのオプションを書き換える必要はない）.
  */
 const TESTED_VERSION = '2.6.4';
 
@@ -194,17 +198,69 @@ function get_flamingo_version(): ?string {
 	return '' !== $version ? $version : null;
 }
 
+/**
+ * 管理者が「確認済みにする」で黙らせたバージョンを返す.
+ *
+ * `get_option()` の戻り値は `mixed` なので `is_string()` で正規化し、
+ * `strict_types=1`（21行）下で should_notify_version() に渡したときの
+ * TypeError を予防する型の門番.
+ *
+ * @return string 確認済みバージョン.未 ack の場合は ''.
+ */
+function get_acked_version(): string {
+	$acked = get_option( OPTION_KEY, '' );
+
+	return is_string( $acked ) ? $acked : '';
+}
+
 // ---------------------------------------------------------------------------
 // バージョン変化の検知と通知
 // ---------------------------------------------------------------------------
+
+/**
+ * 動作確認済みバージョンとの対比でバージョン通知を表示すべきかを判定する純関数.
+ *
+ * 通知条件（すべて満たすとき true）：
+ * 1. $current が null でない（Flamingo が検出できている）
+ * 2. $current が $tested より新しい（動作確認済みバージョンを超えている）
+ * 3. $acked が空、または $current が $acked より新しい（未確認 or 確認済み版より進んでいる）
+ *
+ * $tested を上げて対応を宣言すれば、$acked を書き換えなくても条件2で自動的に false になる
+ * （バージョン通知が消えないバグの根本原因は、この判定が $tested を見ていなかったこと）.
+ *
+ * WP 関数を一切呼ばない純関数にすることで、`wp eval` から実環境を汚さずに
+ * 全状態パターンを検証できるようにしている（第3引数のデフォルト値はそのための後方互換）.
+ *
+ * @param string|null $current インストール済み Flamingo のバージョン. 検出不能なら null.
+ * @param string      $acked   管理者が確認済みとして黙らせたバージョン. 未 ack は ''.
+ * @param string      $tested  動作確認済みバージョン. 検証用に差し替え可能.
+ * @return bool 通知すべきなら true.
+ */
+function should_notify_version( ?string $current, string $acked, string $tested = TESTED_VERSION ): bool {
+	// version_compare() に null を渡すと PHPStan level 5 で型エラーになるため先に弾く.
+	if ( null === $current ) {
+		return false;
+	}
+
+	if ( ! version_compare( $current, $tested, '>' ) ) {
+		return false;
+	}
+
+	// '' === $acked は version_compare( $current, '', '>' ) が真になるため厳密には冗長だが、
+	// 「未 ack なら常に通知する」という意図を自己文書化するために明示的に残す.
+	if ( '' === $acked ) {
+		return true;
+	}
+
+	return version_compare( $current, $acked, '>' );
+}
 
 /**
  * `admin_init` タイミングで Flamingo のバージョン変化を検知する.
  *
  * 処理の流れ：
  * 1. 「確認済み」ボタン押下時は nonce を検証し、既知バージョンを現在値に更新してリダイレクト.
- * 2. 既知バージョンが未保存（初回）の場合は現在値を保存して終了.
- * 3. 既知バージョンより現在のバージョンが新しければ admin_notices に通知を登録.
+ * 2. should_notify_version() が真なら admin_notices に通知を登録.
  *
  * `activate_plugins` 権限を持たないユーザーには何もしない.
  * 「CSV 出力の動作確認」は権限のないユーザーには行動不可能な指示であるため.
@@ -232,22 +288,9 @@ function check_flamingo_version(): void {
 		exit;
 	}
 
-	$known   = get_option( OPTION_KEY, '' );
 	$current = get_flamingo_version();
 
-	if ( null === $current ) {
-		return;
-	}
-
-	if ( '' === $known ) {
-		// 有効化フックが走らなかったケース（手動ファイル配置など）への対応.
-		// 初回アクセス時に現在のバージョンを保存して以降の比較基準とする.
-		update_option( OPTION_KEY, $current, false );
-		return;
-	}
-
-	// 保存済みバージョンより新しいバージョンが検出された場合のみ通知を登録する.
-	if ( version_compare( $current, $known, '>' ) ) {
+	if ( should_notify_version( $current, get_acked_version() ) ) {
 		add_action( 'admin_notices', __NAMESPACE__ . '\\render_version_notice' );
 	}
 }
