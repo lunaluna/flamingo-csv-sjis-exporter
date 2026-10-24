@@ -3,7 +3,7 @@ Contributors: lunaluna_dev
 Tags: flamingo, csv, export, shift-jis, sjis, encoding
 Requires at least: 6.0
 Tested up to: 7.1
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 Requires PHP: 7.4
 Requires Plugins: flamingo
 License: GPLv2 or later
@@ -55,6 +55,10 @@ UTF-8 から **SJIS-win（CP932）** に変換します。ダウンロード応�
 
 == Changelog ==
 
+= 1.3.1 =
+* 同梱の自動更新ライブラリを dist-1.3.1 に更新。更新時のセキュリティを強化した（ダウンロード先 URL の検証、認証ヘッダーをリダイレクト先へ送らない、配布 ZIP のアセット名を完全一致で選ぶ、展開後にメインファイルの存在を確認、ダウンロード失敗時の一時ファイル削除、GitHub の異常なレスポンスの検証）。
+* 開発用の変更。CI とリリースで使う GitHub Actions をコミット SHA で固定し、Dependabot を追加した（配布物への影響なし）。
+
 = 1.3.0 =
 * 同梱の自動更新ライブラリを dist-1.2.0 に更新（利用者から見た機能変化はなし）。
 
@@ -77,6 +81,9 @@ UTF-8 から **SJIS-win（CP932）** に変換します。ダウンロード応�
 * 初版リリース。
 
 == Upgrade Notice ==
+
+= 1.3.1 =
+自動更新ライブラリのセキュリティを強化しました。機能面の変化はありません。
 
 = 1.3.0 =
 同梱の自動更新ライブラリを更新しました。利用者から見た機能変化はありません。

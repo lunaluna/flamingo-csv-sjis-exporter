@@ -4,7 +4,7 @@ WordPress プラグインです。[Flamingo](https://wordpress.org/plugins/flami
 
 - **Requires WordPress:** 6.0+（7.1 で動作確認済み）
 - **Requires PHP:** 7.4+
-- **Stable tag:** 1.3.0
+- **Stable tag:** 1.3.1
 - **License:** GPLv2 or later
 
 ## 動作条件
@@ -43,6 +43,11 @@ Flamingo の **受信メッセージ** 画面から従来どおり CSV をエク
 - **Author:** [lunaluna_dev](https://profiles.wordpress.org/lunaluna_dev/)
 
 ## 変更履歴
+
+### 1.3.1
+
+- 同梱の自動更新ライブラリ（`lunaluna/l2d-wp-github-update-lib`）を `dist-1.3.1` に更新した。更新時のセキュリティを強化している（ダウンロード先 URL の検証、認証ヘッダーをリダイレクト先へ送らない、配布 ZIP のアセット名を完全一致で選ぶ、展開後にメインファイルの存在を確認、ダウンロード失敗時の一時ファイル削除、GitHub の異常なレスポンスの検証）。
+- 開発用の変更。CI とリリースで使う GitHub Actions をコミット SHA で固定し、Dependabot（github-actions）を追加した。配布物への影響はない。
 
 ### 1.3.0
 
