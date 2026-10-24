@@ -1,0 +1,8 @@
+# GitHub Actions の参照(SHA 固定したもの・タグ指定のもの)を週次で更新する PR を出す.
+# npm / composer の依存は、今回は対象外にしている.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
